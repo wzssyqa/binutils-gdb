@@ -1210,7 +1210,15 @@ if { [istarget mips*-*-vxworks*] } {
 	run_dump_test "elf-rel-xgot-n32"
 	run_dump_test "elf-rel-got-n64"
 	run_dump_test "elf-rel-xgot-n64"
+
+	run_dump_test "gotpc-bal-n64"
+	run_dump_test "gotpc-bal-n32"
+	run_dump_test "gotpc-aluipc-n64"
+	run_dump_test "gotpc-aluipc-n32"
     }
+    run_dump_test "gotpc-bal-o32"
+    run_dump_test "gotpc-aluipc-o32"
+
     run_dump_test "elf-rel17"
     if $has_newabi {
 	run_dump_test "elf-rel18"

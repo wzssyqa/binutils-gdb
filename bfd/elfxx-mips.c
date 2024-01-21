@@ -2267,19 +2267,28 @@ got_page_reloc_p (unsigned int r_type)
 static inline bool
 got_lo16_reloc_p (unsigned int r_type)
 {
-  return r_type == R_MIPS_GOT_LO16 || r_type == R_MICROMIPS_GOT_LO16;
+  return (r_type == R_MIPS_GOT_LO16
+	  || r_type == R_MIPS_GOTPC_LO16
+	  || r_type == R_MIPS_GOTPC_ALO16
+	  || r_type == R_MICROMIPS_GOT_LO16);
 }
 
 static inline bool
 call_hi16_reloc_p (unsigned int r_type)
 {
-  return r_type == R_MIPS_CALL_HI16 || r_type == R_MICROMIPS_CALL_HI16;
+  return (r_type == R_MIPS_CALL_HI16
+	  || r_type == R_MIPS_GOTPC_CALL_HI16
+	  || r_type == R_MIPS_GOTPC_CALL_AHI16
+	  || r_type == R_MICROMIPS_CALL_HI16);
 }
 
 static inline bool
 call_lo16_reloc_p (unsigned int r_type)
 {
-  return r_type == R_MIPS_CALL_LO16 || r_type == R_MICROMIPS_CALL_LO16;
+  return (r_type == R_MIPS_CALL_LO16
+	  || r_type == R_MIPS_GOTPC_CALL_LO16
+	  || r_type == R_MIPS_GOTPC_CALL_ALO16
+	  || r_type == R_MICROMIPS_CALL_LO16);
 }
 
 static inline bool
@@ -5240,6 +5249,21 @@ mips_elf_highest (bfd_vma value ATTRIBUTE_UNUSED)
   return MINUS_ONE;
 #endif
 }
+
+/* Calculate the aligned hi or lo for aluipc.  */
+static bfd_vma
+mips_elf_16bit_align (bfd_vma value, bfd_vma p, bool hi)
+{
+  bfd_vma value_lo = (value & 0xffff) + (p & 0xffff);
+  bfd_vma value_hi = (value >> 16) & 0xffff;
+  value_hi += mips_elf_high (value_lo);
+  value_lo &= 0xffff;
+  if (hi)
+    return value_hi;
+  else
+    return value_lo;
+}
+
 
 /* Create the .compact_rel section.  */
 
@@ -5887,6 +5911,10 @@ mips_elf_calculate_relocation (bfd *abfd, bfd *input_bfd,
     case R_MIPS_GOT_DISP:
     case R_MIPS_GOT_LO16:
     case R_MIPS_CALL_LO16:
+    case R_MIPS_GOTPC_LO16:
+    case R_MIPS_GOTPC_CALL_LO16:
+    case R_MIPS_GOTPC_ALO16:
+    case R_MIPS_GOTPC_CALL_ALO16:
     case R_MICROMIPS_CALL16:
     case R_MICROMIPS_GOT16:
     case R_MICROMIPS_GOT_PAGE:
@@ -5904,6 +5932,8 @@ mips_elf_calculate_relocation (bfd *abfd, bfd *input_bfd,
       /* Fall through.  */
     case R_MIPS_GOT_HI16:
     case R_MIPS_CALL_HI16:
+    case R_MIPS_GOTPC_HI16:
+    case R_MIPS_GOTPC_CALL_HI16:
     case R_MICROMIPS_GOT_HI16:
     case R_MICROMIPS_CALL_HI16:
       if (resolved_to_zero
@@ -5951,6 +5981,14 @@ mips_elf_calculate_relocation (bfd *abfd, bfd *input_bfd,
     case R_MIPS_CALL_HI16:
     case R_MIPS_GOT_LO16:
     case R_MIPS_CALL_LO16:
+    case R_MIPS_GOTPC_HI16:
+    case R_MIPS_GOTPC_LO16:
+    case R_MIPS_GOTPC_CALL_HI16:
+    case R_MIPS_GOTPC_CALL_LO16:
+    case R_MIPS_GOTPC_AHI16:
+    case R_MIPS_GOTPC_ALO16:
+    case R_MIPS_GOTPC_CALL_AHI16:
+    case R_MIPS_GOTPC_CALL_ALO16:
     case R_MICROMIPS_CALL16:
     case R_MICROMIPS_GOT16:
     case R_MICROMIPS_GOT_DISP:
@@ -6409,6 +6447,45 @@ mips_elf_calculate_relocation (bfd *abfd, bfd *input_bfd,
       if (was_local_p || h->root.root.type != bfd_link_hash_undefweak)
 	overflowed_p = mips_elf_overflow_p (value, 21);
       value >>= howto->rightshift;
+      value &= howto->dst_mask;
+      break;
+
+    /* For r6 and pre-r6, we can use:
+	bal	. + 8
+	lui	$2,%gotpc_hi(sym) # or %gotpc_call_hi
+	addu	$2,$2,$ra
+	lw	$2,%gotpc_lo(sym) # or %gotpc_call_lo
+       In this case, the LO should +=4, and HI should -=4.
+
+       For R6+, we can use
+	aluipc	$2,%gotpc_ahi(sym) # or %gotpc_call_ahi
+	lw	$2,%gotpc_alo(sym)($2) or %gotpc_call_alo
+       In this case, the HI is OK, while LO should +4 and add the page_offet */
+    case R_MIPS_GOTPC_HI16:
+    case R_MIPS_GOTPC_CALL_HI16:
+      value = mips_elf_high (addend + gp - p + g - 4);
+      value &= howto->dst_mask;
+      break;
+
+    case R_MIPS_GOTPC_LO16:
+    case R_MIPS_GOTPC_CALL_LO16:
+      if (howto->partial_inplace)
+	addend = _bfd_mips_elf_sign_extend (addend, 16);
+      value = addend + gp - p + g + 4;
+      value &= howto->dst_mask;
+      break;
+
+    case R_MIPS_GOTPC_AHI16:
+    case R_MIPS_GOTPC_CALL_AHI16:
+      value = mips_elf_16bit_align (addend + gp - p + g, p, true);
+      value &= howto->dst_mask;
+      break;
+
+    case R_MIPS_GOTPC_ALO16:
+    case R_MIPS_GOTPC_CALL_ALO16:
+      if (howto->partial_inplace)
+	addend = _bfd_mips_elf_sign_extend (addend, 16);
+      value = mips_elf_16bit_align (addend + gp - p + g, p, false);
       value &= howto->dst_mask;
       break;
 
@@ -8282,6 +8359,14 @@ mips_elf_add_lo16_rel_addend (bfd *abfd,
     lo16_type = R_MIPS16_LO16;
   else if (micromips_reloc_p (r_type))
     lo16_type = R_MICROMIPS_LO16;
+  else if (r_type == R_MIPS_GOTPC_HI16)
+    lo16_type = R_MIPS_GOTPC_LO16;
+  else if (r_type == R_MIPS_GOTPC_CALL_HI16)
+    lo16_type = R_MIPS_GOTPC_CALL_LO16;
+  else if (r_type == R_MIPS_GOTPC_AHI16)
+    lo16_type = R_MIPS_GOTPC_ALO16;
+  else if (r_type == R_MIPS_GOTPC_CALL_AHI16)
+    lo16_type = R_MIPS_GOTPC_CALL_ALO16;
   else if (r_type == R_MIPS_PCHI16)
     lo16_type = R_MIPS_PCLO16;
   else
@@ -8742,6 +8827,10 @@ _bfd_mips_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	case R_MIPS_CALL16:
 	case R_MIPS_CALL_HI16:
 	case R_MIPS_CALL_LO16:
+	case R_MIPS_GOTPC_CALL_HI16:
+	case R_MIPS_GOTPC_CALL_LO16:
+	case R_MIPS_GOTPC_CALL_AHI16:
+	case R_MIPS_GOTPC_CALL_ALO16:
 	case R_MIPS16_CALL16:
 	case R_MICROMIPS_CALL16:
 	case R_MICROMIPS_CALL_HI16:
@@ -8751,6 +8840,8 @@ _bfd_mips_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 
 	case R_MIPS_GOT16:
 	case R_MIPS_GOT_LO16:
+	case R_MIPS_GOTPC_LO16:
+	case R_MIPS_GOTPC_ALO16:
 	case R_MIPS_GOT_PAGE:
 	case R_MIPS_GOT_DISP:
 	case R_MIPS16_GOT16:
@@ -8788,6 +8879,8 @@ _bfd_mips_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 
 	  /* Fall through.  */
 	case R_MIPS_GOT_HI16:
+	case R_MIPS_GOTPC_HI16:
+	case R_MIPS_GOTPC_AHI16:
 	case R_MIPS_GOT_OFST:
 	case R_MIPS_TLS_GOTTPREL:
 	case R_MIPS_TLS_GD:
@@ -8958,6 +9051,10 @@ _bfd_mips_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 
 	case R_MIPS_CALL_HI16:
 	case R_MIPS_CALL_LO16:
+	case R_MIPS_GOTPC_CALL_HI16:
+	case R_MIPS_GOTPC_CALL_LO16:
+	case R_MIPS_GOTPC_CALL_AHI16:
+	case R_MIPS_GOTPC_CALL_ALO16:
 	case R_MICROMIPS_CALL_HI16:
 	case R_MICROMIPS_CALL_LO16:
 	  if (h != NULL)
@@ -8983,6 +9080,10 @@ _bfd_mips_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	case R_MIPS_GOT16:
 	case R_MIPS_GOT_HI16:
 	case R_MIPS_GOT_LO16:
+	case R_MIPS_GOTPC_HI16:
+	case R_MIPS_GOTPC_LO16:
+	case R_MIPS_GOTPC_AHI16:
+	case R_MIPS_GOTPC_ALO16:
 	case R_MICROMIPS_GOT16:
 	case R_MICROMIPS_GOT_HI16:
 	case R_MICROMIPS_GOT_LO16:

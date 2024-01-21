@@ -1,0 +1,75 @@
+
+.*: +file format .*mips.*
+
+DYNAMIC SYMBOL TABLE:
+0000000000000000 g    DF .text	0000000000000074 f1
+0000000000000090      DF \*UND\*	0000000000000000 c1
+0000000000000004 g    DO \*ABS\*	0000000000000004 g2
+0000000000000080      DF \*UND\*	0000000000000000 c2
+0000000000000000 g    DO \*ABS\*	0000000000000004 g1
+
+
+
+Disassembly of section .text:
+
+0000000000000000 <f1>:
+   0:	67bdfff0 	daddiu	sp,sp,-16
+   4:	ffbf0008 	sd	ra,8\(sp\)
+   8:	ffb00000 	sd	s0,0\(sp\)
+   c:	24100000 	li	s0,0
+
+0000000000000010 <L0\^A>:
+  10:	04110001 	bal	18 <L0\^A\+0x8>
+  14:	3c190000 	lui	t9,0x0
+  18:	033fc82d 	daddu	t9,t9,ra
+  1c:	df3900a8 	ld	t9,168\(t9\)
+  20:	0320f809 	jalr	t9
+  24:	00000000 	nop
+  28:	02028021 	addu	s0,s0,v0
+  2c:	ef3f0000 	aluipc	t9,0x0
+  30:	df3900d0 	ld	t9,208\(t9\)
+  34:	0320f809 	jalr	t9
+  38:	00000000 	nop
+  3c:	02028021 	addu	s0,s0,v0
+
+0000000000000040 <L0\^A>:
+  40:	04110001 	bal	48 <L0\^A\+0x8>
+  44:	3c020000 	lui	v0,0x0
+  48:	005f102d 	daddu	v0,v0,ra
+  4c:	8c420090 	lw	v0,144\(v0\)
+  50:	00501021 	addu	v0,v0,s0
+  54:	ec7f0000 	aluipc	v1,0x0
+  58:	8c6300c8 	lw	v1,200\(v1\)
+  5c:	00431021 	addu	v0,v0,v1
+  60:	dfb00000 	ld	s0,0\(sp\)
+  64:	dfbf0008 	ld	ra,8\(sp\)
+  68:	24420001 	addiu	v0,v0,1
+  6c:	03e00009 	jr	ra
+  70:	67bd0010 	daddiu	sp,sp,16
+	...
+
+Disassembly of section .MIPS.stubs:
+
+0000000000000080 <_MIPS_STUBS_>:
+  80:	df998010 	ld	t9,-32752\(gp\)
+  84:	03e07825 	move	t3,ra
+  88:	0320f809 	jalr	t9
+  8c:	64180004 	daddiu	t8,zero,4
+  90:	df998010 	ld	t9,-32752\(gp\)
+  94:	03e07825 	move	t3,ra
+  98:	0320f809 	jalr	t9
+  9c:	64180002 	daddiu	t8,zero,2
+	...
+
+Disassembly of section .got:
+
+00000000000000b0 <.got>:
+	...
+  bc:	80000000 	lb	zero,0\(zero\)
+  c0:	00000090 	.word	0x90
+  c4:	00000000 	nop
+  c8:	00000004 	sllv	zero,zero,zero
+  cc:	00000000 	nop
+  d0:	00000080 	sll	zero,zero,0x2
+	...
+#...

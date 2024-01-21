@@ -809,6 +809,119 @@ static reloc_howto_type elf_mips_howto_table_rel[] =
 	 0x0000ffff,		/* src_mask */
 	 0x0000ffff,		/* dst_mask */
 	 true),			/* pcrel_offset */
+
+  HOWTO (R_MIPS_GOTPC_HI16,	/* type */
+	 16,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 true,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_signed, /* complain_on_overflow */
+	 _bfd_mips_elf_generic_reloc,   /* special_function */
+	 "R_MIPS_GOTPC_HI16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 true),			/* pcrel_offset */
+
+  HOWTO (R_MIPS_GOTPC_LO16,	/* type */
+	 0,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 true,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_dont, /* complain_on_overflow */
+	 _bfd_mips_elf_generic_reloc,   /* special_function */
+	 "R_MIPS_GOTPC_LO16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 true),			/* pcrel_offset */
+
+  HOWTO (R_MIPS_GOTPC_CALL_HI16,	/* type */
+	 16,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 true,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_signed, /* complain_on_overflow */
+	 _bfd_mips_elf_generic_reloc,   /* special_function */
+	 "R_MIPS_GOTPC_CALL_HI16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 true),			/* pcrel_offset */
+
+  HOWTO (R_MIPS_GOTPC_CALL_LO16,	/* type */
+	 0,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 true,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_dont, /* complain_on_overflow */
+	 _bfd_mips_elf_generic_reloc,   /* special_function */
+	 "R_MIPS_GOTPC_CALL_LO16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 true),			/* pcrel_offset */
+
+  HOWTO (R_MIPS_GOTPC_AHI16,	/* type */
+	 16,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 true,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_signed, /* complain_on_overflow */
+	 _bfd_mips_elf_generic_reloc,   /* special_function */
+	 "R_MIPS_GOTPC_AHI16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 true),			/* pcrel_offset */
+
+  HOWTO (R_MIPS_GOTPC_ALO16,	/* type */
+	 0,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 true,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_dont, /* complain_on_overflow */
+	 _bfd_mips_elf_generic_reloc,   /* special_function */
+	 "R_MIPS_GOTPC_ALO16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 true),			/* pcrel_offset */
+
+  HOWTO (R_MIPS_GOTPC_CALL_AHI16,	/* type */
+	 16,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 true,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_signed, /* complain_on_overflow */
+	 _bfd_mips_elf_generic_reloc,   /* special_function */
+	 "R_MIPS_GOTPC_CALL_AHI16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 true),			/* pcrel_offset */
+
+  HOWTO (R_MIPS_GOTPC_CALL_ALO16,	/* type */
+	 0,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 true,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_dont, /* complain_on_overflow */
+	 _bfd_mips_elf_generic_reloc,   /* special_function */
+	 "R_MIPS_GOTPC_CALL_ALO16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 true),			/* pcrel_offset */
+
 };
 
 /* The reloc used for BFD_RELOC_CTOR when doing a 64 bit link.  This
@@ -2030,7 +2143,15 @@ static const struct elf_reloc_map mips_reloc_map[] =
   { BFD_RELOC_MIPS_18_PCREL_S3, R_MIPS_PC18_S3 },
   { BFD_RELOC_MIPS_19_PCREL_S2, R_MIPS_PC19_S2 },
   { BFD_RELOC_HI16_S_PCREL, R_MIPS_PCHI16 },
-  { BFD_RELOC_LO16_PCREL, R_MIPS_PCLO16 }
+  { BFD_RELOC_LO16_PCREL, R_MIPS_PCLO16 },
+  { BFD_RELOC_HI16_S_GOTOFF, R_MIPS_GOTPC_HI16 },
+  { BFD_RELOC_LO16_GOTOFF, R_MIPS_GOTPC_LO16 },
+  { BFD_RELOC_MIPS_HI16_S_GOTOFF_CALL, R_MIPS_GOTPC_CALL_HI16 },
+  { BFD_RELOC_MIPS_LO16_GOTOFF_CALL, R_MIPS_GOTPC_CALL_LO16 },
+  { BFD_RELOC_MIPS_AHI16_S_GOTOFF, R_MIPS_GOTPC_AHI16 },
+  { BFD_RELOC_MIPS_ALO16_GOTOFF, R_MIPS_GOTPC_ALO16 },
+  { BFD_RELOC_MIPS_AHI16_S_GOTOFF_CALL, R_MIPS_GOTPC_CALL_AHI16 },
+  { BFD_RELOC_MIPS_ALO16_GOTOFF_CALL, R_MIPS_GOTPC_CALL_ALO16 }
 };
 
 static const struct elf_reloc_map mips16_reloc_map[] =

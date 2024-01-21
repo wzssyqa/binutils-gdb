@@ -1,0 +1,15 @@
+
+Primary GOT:
+ Canonical gp value: 00000000000080a0
+
+ Reserved entries:
+           Address     Access          Initial Purpose
+  00000000000000b0 -32752\(gp\) 0000000000000000 Lazy resolver
+  00000000000000b8 -32744\(gp\) 8000000000000000 Module pointer \(GNU extension\)
+
+ Global entries:
+           Address     Access          Initial         Sym.Val. Type    Ndx Name
+  00000000000000c0 -32736\(gp\) 0000000000000090 0000000000000090 FUNC    UND c1
+  00000000000000c8 -32728\(gp\) 0000000000000004 0000000000000004 OBJECT  ABS g2
+  00000000000000d0 -32720\(gp\) 0000000000000080 0000000000000080 FUNC    UND c2
+  00000000000000d8 -32712\(gp\) 0000000000000000 0000000000000000 OBJECT  ABS g1
