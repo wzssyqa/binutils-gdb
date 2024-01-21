@@ -4370,7 +4370,11 @@ limited_pcrel_reloc_p (bfd_reloc_code_real_type reloc)
       return true;
 
     case BFD_RELOC_32_PCREL:
+    case BFD_RELOC_HI16_S_GOTOFF:
+    case BFD_RELOC_LO16_GOTOFF:
     case BFD_RELOC_HI16_S_PCREL:
+    case BFD_RELOC_LO16_GOTOFF_CALL:
+    case BFD_RELOC_HI16_S_GOTOFF_CALL:
     case BFD_RELOC_LO16_PCREL:
       return HAVE_64BIT_ADDRESSES;
 
@@ -7432,6 +7436,7 @@ calculate_reloc (bfd_reloc_code_real_type reloc, offsetT operand,
 
     case BFD_RELOC_HI16_S:
     case BFD_RELOC_HI16_S_PCREL:
+    case BFD_RELOC_HI16_S_GOTOFF:
     case BFD_RELOC_MICROMIPS_HI16_S:
     case BFD_RELOC_MIPS16_HI16_S:
       *result = ((operand + 0x8000) >> 16) & 0xffff;
@@ -7445,6 +7450,8 @@ calculate_reloc (bfd_reloc_code_real_type reloc, offsetT operand,
 
     case BFD_RELOC_LO16:
     case BFD_RELOC_LO16_PCREL:
+    case BFD_RELOC_LO16_GOTOFF:
+    case BFD_RELOC_LO16_GOTOFF_CALL:
     case BFD_RELOC_MICROMIPS_LO16:
     case BFD_RELOC_MIPS16_LO16:
       *result = operand & 0xffff;
@@ -14583,7 +14590,11 @@ static const struct percent_op_match mips_percent_op[] =
   {"%gottprel", BFD_RELOC_MIPS_TLS_GOTTPREL},
   {"%hi", BFD_RELOC_HI16_S},
   {"%pcrel_hi", BFD_RELOC_HI16_S_PCREL},
-  {"%pcrel_lo", BFD_RELOC_LO16_PCREL}
+  {"%pcrel_lo", BFD_RELOC_LO16_PCREL},
+  {"%gotpc_hi", BFD_RELOC_HI16_S_GOTOFF},
+  {"%gotpc_lo", BFD_RELOC_LO16_GOTOFF},
+  {"%gotpc_call_hi", BFD_RELOC_HI16_S_GOTOFF_CALL},
+  {"%gotpc_call_lo", BFD_RELOC_LO16_GOTOFF_CALL}
 };
 
 static const struct percent_op_match mips16_percent_op[] =
@@ -15541,7 +15552,11 @@ mips_force_relocation (fixS *fixp)
 	  || fixp->fx_r_type == BFD_RELOC_MIPS_26_PCREL_S2
 	  || fixp->fx_r_type == BFD_RELOC_MIPS_18_PCREL_S3
 	  || fixp->fx_r_type == BFD_RELOC_MIPS_19_PCREL_S2
+	  || fixp->fx_r_type == BFD_RELOC_HI16_S_GOTOFF
+	  || fixp->fx_r_type == BFD_RELOC_LO16_GOTOFF
 	  || fixp->fx_r_type == BFD_RELOC_HI16_S_PCREL
+	  || fixp->fx_r_type == BFD_RELOC_LO16_GOTOFF_CALL
+	  || fixp->fx_r_type == BFD_RELOC_HI16_S_GOTOFF_CALL
 	  || fixp->fx_r_type == BFD_RELOC_LO16_PCREL))
     return 1;
 
@@ -15822,6 +15837,10 @@ md_apply_fix (fixS *fixP, valueT *valP, segT seg ATTRIBUTE_UNUSED)
       case BFD_RELOC_MIPS_19_PCREL_S2:
       case BFD_RELOC_HI16_S_PCREL:
       case BFD_RELOC_LO16_PCREL:
+      case BFD_RELOC_HI16_S_GOTOFF:
+      case BFD_RELOC_LO16_GOTOFF:
+      case BFD_RELOC_HI16_S_GOTOFF_CALL:
+      case BFD_RELOC_LO16_GOTOFF_CALL:
 	break;
 
       case BFD_RELOC_32:
@@ -15965,6 +15984,10 @@ md_apply_fix (fixS *fixP, valueT *valP, segT seg ATTRIBUTE_UNUSED)
     case BFD_RELOC_MIPS_GOT_LO16:
     case BFD_RELOC_MIPS_CALL_HI16:
     case BFD_RELOC_MIPS_CALL_LO16:
+    case BFD_RELOC_HI16_S_GOTOFF:
+    case BFD_RELOC_LO16_GOTOFF:
+    case BFD_RELOC_HI16_S_GOTOFF_CALL:
+    case BFD_RELOC_LO16_GOTOFF_CALL:
     case BFD_RELOC_HI16_S_PCREL:
     case BFD_RELOC_LO16_PCREL:
     case BFD_RELOC_MIPS16_GPREL:
@@ -18386,7 +18409,11 @@ tc_gen_reloc (asection *section ATTRIBUTE_UNUSED, fixS *fixp)
 		  || fixp->fx_r_type == BFD_RELOC_MIPS_26_PCREL_S2
 		  || fixp->fx_r_type == BFD_RELOC_MIPS_18_PCREL_S3
 		  || fixp->fx_r_type == BFD_RELOC_MIPS_19_PCREL_S2
+		  || fixp->fx_r_type == BFD_RELOC_HI16_S_GOTOFF
+		  || fixp->fx_r_type == BFD_RELOC_LO16_GOTOFF
 		  || fixp->fx_r_type == BFD_RELOC_HI16_S_PCREL
+		  || fixp->fx_r_type == BFD_RELOC_LO16_GOTOFF_CALL
+		  || fixp->fx_r_type == BFD_RELOC_HI16_S_GOTOFF_CALL
 		  || fixp->fx_r_type == BFD_RELOC_LO16_PCREL);
 
       /* At this point, fx_addnumber is "symbol offset - pcrel address".

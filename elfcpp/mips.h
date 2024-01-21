@@ -104,6 +104,8 @@ enum
   R_MIPS_PC19_S2 = 63,
   R_MIPS_PCHI16 = 64,
   R_MIPS_PCLO16 = 65,
+  R_MIPS_GOTPC_HI16 = 66,
+  R_MIPS_GOTPC_LO16 = 67,
   // These relocs are used for the mips16.
   R_MIPS16_26 = 100,
   R_MIPS16_GPREL = 101,
