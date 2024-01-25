@@ -6292,6 +6292,8 @@ mips_elf_calculate_relocation (bfd *abfd, bfd *input_bfd,
 	 order.  We don't need to do anything special here; the
 	 differences are handled in mips_elf_perform_relocation.  */
     case R_MIPS_GPREL16:
+    case R_MIPS_GPREL_HI16:
+    case R_MIPS_GPREL_LO16:
     case R_MICROMIPS_GPREL7_S2:
     case R_MICROMIPS_GPREL16:
       {
@@ -6309,6 +6311,10 @@ mips_elf_calculate_relocation (bfd *abfd, bfd *input_bfd,
 	   to them before.  */
 	if (was_local_p)
 	  value += gp0;
+	if (r_type == R_MIPS_GPREL_HI16)
+	  value = mips_elf_high (value);
+	if (r_type == R_MIPS_GPREL_LO16)
+	  value &= howto->dst_mask;
 	if (was_local_p || h->root.root.type != bfd_link_hash_undefweak)
 	  overflowed_p = mips_elf_overflow_p (value, bits);
       }
@@ -8919,6 +8925,8 @@ _bfd_mips_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	  break;
 
 	case R_MIPS_GPREL16:
+	case R_MIPS_GPREL_HI16:
+	case R_MIPS_GPREL_LO16:
 	case R_MIPS_GPREL32:
 	case R_MIPS16_GPREL:
 	case R_MICROMIPS_GPREL16:
@@ -9228,6 +9236,8 @@ _bfd_mips_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 
 	case R_MIPS_26:
 	case R_MIPS_GPREL16:
+	case R_MIPS_GPREL_HI16:
+	case R_MIPS_GPREL_LO16:
 	case R_MIPS_LITERAL:
 	case R_MIPS_GPREL32:
 	case R_MICROMIPS_26_S1:

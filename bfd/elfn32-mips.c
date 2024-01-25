@@ -980,6 +980,8 @@ static reloc_howto_type elf_mips_howto_table_rel[] =
 	 0x0000ffff,		/* dst_mask */
 	 true),			/* pcrel_offset */
 
+  EMPTY_HOWTO (R_MIPS_GPREL_HI16), /* 74 */
+  EMPTY_HOWTO (R_MIPS_GPREL_LO16), /* 75 */
 };
 
 /* The relocation table used for SHT_RELA sections.  */
@@ -1874,6 +1876,8 @@ static reloc_howto_type elf_mips_howto_table_rela[] =
 	 0x0000ffff,		/* dst_mask */
 	 true),			/* pcrel_offset */
 
+  EMPTY_HOWTO (R_MIPS_GPREL_HI16), /* 74 */
+  EMPTY_HOWTO (R_MIPS_GPREL_LO16), /* 75 */
 };
 
 static reloc_howto_type elf_mips16_howto_table_rel[] =

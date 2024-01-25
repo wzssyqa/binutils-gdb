@@ -3374,6 +3374,9 @@ enum bfd_reloc_code_real
      handled specially, because the value the register will have is
      decided relatively late.  */
   BFD_RELOC_GPREL16,
+  BFD_RELOC_GPREL_HI16,
+  BFD_RELOC_GPREL_HI16_S,
+  BFD_RELOC_GPREL_LO16,
   BFD_RELOC_GPREL32,
 
   /* SPARC ELF relocations.  There is probably some overlap with other
