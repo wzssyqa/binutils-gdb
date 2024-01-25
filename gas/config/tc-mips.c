@@ -4346,7 +4346,9 @@ jalr_reloc_p (bfd_reloc_code_real_type reloc)
 static inline bool
 gprel16_reloc_p (bfd_reloc_code_real_type reloc)
 {
-  return (reloc == BFD_RELOC_GPREL16 || reloc == BFD_RELOC_MIPS16_GPREL
+  return (reloc == BFD_RELOC_GPREL16
+	  || reloc == BFD_RELOC_GPREL_LO16
+	  || reloc == BFD_RELOC_MIPS16_GPREL
 	  || reloc == BFD_RELOC_MICROMIPS_GPREL16);
 }
 
@@ -7917,6 +7919,8 @@ append_insn (struct mips_cl_insn *ip, expressionS *address_expr,
 	      || reloc_type[0] == BFD_RELOC_32
 	      || reloc_type[0] == BFD_RELOC_MIPS_JMP
 	      || reloc_type[0] == BFD_RELOC_GPREL16
+	      || reloc_type[0] == BFD_RELOC_GPREL_LO16
+	      || reloc_type[0] == BFD_RELOC_GPREL_HI16_S
 	      || reloc_type[0] == BFD_RELOC_MIPS_LITERAL
 	      || reloc_type[0] == BFD_RELOC_GPREL32
 	      || reloc_type[0] == BFD_RELOC_64
@@ -9084,6 +9088,7 @@ macro_build (expressionS *ep, const char *name, const char *fmt, ...)
 	case 'j':
 	  macro_read_relocs (&args, r);
 	  gas_assert (*r == BFD_RELOC_GPREL16
+		      || *r == BFD_RELOC_GPREL_LO16
 		      || *r == BFD_RELOC_MIPS_HIGHER
 		      || *r == BFD_RELOC_HI16_S
 		      || *r == BFD_RELOC_LO16
@@ -9122,6 +9127,7 @@ macro_build (expressionS *ep, const char *name, const char *fmt, ...)
 				  || *r == BFD_RELOC_HI16_S
 				  || *r == BFD_RELOC_HI16
 				  || *r == BFD_RELOC_GPREL16
+				  || *r == BFD_RELOC_GPREL_HI16_S
 				  || *r == BFD_RELOC_MIPS_GOT_HI16
 				  || *r == BFD_RELOC_MIPS_CALL_HI16))));
 	  break;
@@ -14577,6 +14583,8 @@ static const struct percent_op_match mips_percent_op[] =
   {"%got", BFD_RELOC_MIPS_GOT16},
   {"%gp_rel", BFD_RELOC_GPREL16},
   {"%gprel", BFD_RELOC_GPREL16},
+  {"%gprel_hi", BFD_RELOC_GPREL_HI16_S},
+  {"%gprel_lo", BFD_RELOC_GPREL_LO16},
   {"%half", BFD_RELOC_MIPS_16},
   {"%highest", BFD_RELOC_MIPS_HIGHEST},
   {"%higher", BFD_RELOC_MIPS_HIGHER},
@@ -15976,6 +15984,8 @@ md_apply_fix (fixS *fixP, valueT *valP, segT seg ATTRIBUTE_UNUSED)
     case BFD_RELOC_HI16_S:
     case BFD_RELOC_LO16:
     case BFD_RELOC_GPREL16:
+    case BFD_RELOC_GPREL_LO16:
+    case BFD_RELOC_GPREL_HI16_S:
     case BFD_RELOC_MIPS_LITERAL:
     case BFD_RELOC_MIPS_CALL16:
     case BFD_RELOC_MIPS_GOT16:

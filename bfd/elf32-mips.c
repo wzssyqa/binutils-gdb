@@ -865,6 +865,36 @@ static reloc_howto_type elf_mips_howto_table_rel[] =
 	 0x0000ffff,		/* src_mask */
 	 0x0000ffff,		/* dst_mask */
 	 true),			/* pcrel_offset */
+
+  /* GP relative reference: HI16.  */
+  HOWTO (R_MIPS_GPREL_HI16,	/* type */
+	 16,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 false,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_signed, /* complain_on_overflow */
+	 _bfd_mips_elf32_gprel16_reloc, /* special_function */
+	 "R_MIPS_GPREL_HI16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 false),		/* pcrel_offset */
+
+  /* GP relative reference: LO16.  */
+  HOWTO (R_MIPS_GPREL_LO16,	/* type */
+	 0,			/* rightshift */
+	 4,			/* size */
+	 16,			/* bitsize */
+	 false,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_signed, /* complain_on_overflow */
+	 _bfd_mips_elf32_gprel16_reloc, /* special_function */
+	 "R_MIPS_GPREL_LO16",	/* name */
+	 true,			/* partial_inplace */
+	 0x0000ffff,		/* src_mask */
+	 0x0000ffff,		/* dst_mask */
+	 false),		/* pcrel_offset */
 };
 
 /* The reloc used for BFD_RELOC_CTOR when doing a 64 bit link.  This
@@ -2054,6 +2084,8 @@ static const struct elf_reloc_map mips_reloc_map[] =
   { BFD_RELOC_HI16_S, R_MIPS_HI16 },
   { BFD_RELOC_LO16, R_MIPS_LO16 },
   { BFD_RELOC_GPREL16, R_MIPS_GPREL16 },
+  { BFD_RELOC_GPREL_HI16_S, R_MIPS_GPREL_HI16 },
+  { BFD_RELOC_GPREL_LO16, R_MIPS_GPREL_LO16 },
   { BFD_RELOC_MIPS_LITERAL, R_MIPS_LITERAL },
   { BFD_RELOC_MIPS_GOT16, R_MIPS_GOT16 },
   { BFD_RELOC_16_PCREL_S2, R_MIPS_PC16 },
