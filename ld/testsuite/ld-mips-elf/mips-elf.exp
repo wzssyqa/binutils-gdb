@@ -719,6 +719,29 @@ if { $linux_gnu } {
 		    "readelf --relocs gp-hidden${suff64}.rd" \
 		    "readelf --syms gp-hidden.sd"] \
 		"gp-hidden-${abi}"]]
+
+	set gotpc_asflags [regsub -- {-march=[^[:blank:]]*} $abi_asflags($abi) {}]
+	run_ld_link_tests [list \
+	    [list \
+		"MIPS R_MIPS_GOTPC support (Prepare, $abi)" \
+		"$abi_ldflags($abi) -shared -T gotpc.ld" \
+		"" \
+		"$gotpc_asflags -mips64r6 -KPIC" \
+		[list gotpc-callee.s] \
+		"" \
+		"libgotpc-callee-${abi}.so"]]
+	run_ld_link_tests [list \
+	    [list \
+		"MIPS R_MIPS_GOTPC support ($abi)" \
+		"$abi_ldflags($abi) -shared -T gotpc.ld \
+		-Ltmpdir -lgotpc-callee-${abi}" \
+		"" \
+		"$gotpc_asflags -mips64r6 -KPIC" \
+		[list gotpc-${abi}.s] \
+		[list \
+		    "objdump -DTC gotpc-${abi}.dd" \
+		    "readelf -A gotpc-${abi}.gd"] \
+		"gotpc-${abi}.so"]]
     }
 }
 
